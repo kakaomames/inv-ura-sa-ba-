@@ -69,6 +69,10 @@ export const youtubePlayerReq = async (
         contentPoToken,
     );
 
+
+    // 💡 ★ここにレスポンス情報をログに出力します！★
+    console.log(`[RES INFO] APIレスポンス受信: Status ${youtubePlayerResponse.status_code}`);
+    console.log("-----------------------------------------");
     // Check if the first adaptive format URL is undefined, if it is then fallback to multiple YT clients
 
     if (
