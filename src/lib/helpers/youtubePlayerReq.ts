@@ -19,7 +19,15 @@ function callWatchEndpoint(
             contentCheckOk: true,
         },
     });
-
+// 💡 ★ここにリクエスト情報をログに出力します！★
+    console.log("-----------------------------------------");
+   // console.log(`[REQ INFO] YouTube APIエンドポイント: /watch`);
+    console.log(`[REQ INFO] Target Video ID: ${videoId}`);
+    console.log(`[REQ INFO] Innertube Client Type (Client Header): ${innertubeClientType}`);
+    console.log(`[REQ INFO] Playback Context (signatureTimestamp): ${innertubeClient.session.player?.sts}`);
+    console.log(`[REQ INFO] PO Token (Security Header): ${contentPoToken.substring(0, 10)}...`);
+    console.log("-----------------------------------------");
+    
     return watch_endpoint.call(
         innertubeClient.actions,
         {
@@ -70,13 +78,13 @@ export const youtubePlayerReq = async (
             undefined
     ) {
         console.log(
-            "[WARNING] No URLs found for adaptive formats. Falling back to other YT clients.",
+            "[WARNING] アダプティブフォーマットのURLが見つかりません。他のYTクライアントに後退する。",
         );
         const innertubeClientsTypeFallback = ["TV_SIMPLY", "MWEB"];
 
         for await (const innertubeClientType of innertubeClientsTypeFallback) {
             console.log(
-                `[WARNING] Trying fallback YT client ${innertubeClientType}`,
+                `[WARNING] YT クライアントのフォールバックの試し ${innertubeClientType}`,
             );
             const youtubePlayerResponseFallback = await callWatchEndpoint(
                 videoId,
