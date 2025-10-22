@@ -16,7 +16,7 @@
  use_unix_socket = false # env variable: SERVER_USE_UNIX_SOCKET
  unix_socket_path = "/tmp/invidious-companion.sock" # env variable: SERVER_UNIX_SOCKET_PATH
  # secret key needs to be exactly 16 characters long
- secret_key = "CHANGE_ME" # env variable: SERVER_SECRET_KEY
+ secret_key = "d484h5jddbiyt776" # env variable: SERVER_SECRET_KEY
  verify_requests = false # env variable: SERVER_VERIFY_REQUESTS
  encrypt_query_params = false # env variable: SERVER_ENCRYPT_QUERY_PARAMS
  enable_metrics = false # env variable: SERVER_ENABLE_METRICS
