@@ -5,17 +5,16 @@ import os
 # main.pyがあるディレクトリ(プロジェクトのルート)をパスに追加
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# 既存のインポート文
-from lib.helpers.config import parse_config # <-- このまま使えるはず
-from videoplayback import video_playback_router
-# ... 後続のコード ...
-
+# 既存のインポート文はそのまま
 import uvicorn
 from fastapi import FastAPI
 import asyncio
-# Denoコードの parseConfig の代わり 
-# Denoコードの videoPlaybackProxy の代わり 
+# Denoコードの parseConfig の代わり
+from lib.helpers.config import parse_config 
+from videoplayback import video_playback_router 
 import signal
+import sys
+# ... 後続のコード ...
 
 
 # Deno L304-L318 のシグナルハンドリングを Python で再現
