@@ -1,20 +1,26 @@
-# lib/helpers/config.py
+# lib/helpers/config.py の修正
 import json
 import os
 from typing import Dict, Any
-
-# ❗ 注意: Denoコードは 'await parseConfig()' でしたが、
-# PythonでシンプルなJSON読み込みは通常同期で行います。
 
 def parse_config() -> Dict[str, Any]:
     """
     config.json ファイルを読み込み、Pythonの辞書として返す。
     """
-    # スクリプトがある場所（lib/helpers）から相対的にプロジェクトルートを特定
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    # プロジェクトルートに移動: .../lib/helpers/config.py -> .../lib/helpers -> .../lib -> .../inv
-    project_root = os.path.dirname(os.path.dirname(base_dir))
-    config_path = os.path.join(project_root, 'config.json')
+    # Vercel環境に対応するため、カレントディレクトリ（/var/task）を基点にする
+    # または、os.getcwd() を使ってプロジェクトのルートを取得する
+    
+    # 既存のロジック:
+    # base_dir = os.path.dirname(os.path.abspath(__file__))
+    # project_root = os.path.dirname(os.path.dirname(base_dir))
+    # config_path = os.path.join(project_root, 'config.json')
+
+    # 新しいロジック: 環境に依存せず、常にプロジェクトルート（カレントディレクトリ）の config.json を探す
+    config_path = os.path.join(os.getcwd(), 'config.json')
+    
+    # os.getcwd()がVercelで信頼できない場合、最もシンプルな方法:
+    config_path = 'config.json' 
+    # Vercelはプロジェクトのルートにあるファイルをカレントディレクトリ(/var/task)に配置するため
 
     print(f"[INFO] 設定ファイル '{config_path}' を読み込みます。")
 
@@ -23,10 +29,9 @@ def parse_config() -> Dict[str, Any]:
             config_data = json.load(f)
         return config_data
     except FileNotFoundError:
-        print("[FATAL] エラー: 'config.json' ファイルが見つかりません！")
-        print("プロジェクトのルートディレクトリに設定ファイルがあるか確認してください。")
-        # 実行を停止
+        # Vercel環境でファイルが見つからない場合は、致命的エラーとして扱う
+        print(f"[FATAL] エラー: '{config_path}' ファイルが見つかりません！")
         raise SystemExit(1)
     except json.JSONDecodeError as e:
-        print(f"[FATAL] エラー: 'config.json' の形式が不正です。JSONパースエラー: {e}")
+        print(f"[FATAL] エラー: '{config_path}' の形式が不正です。JSONパースエラー: {e}")
         raise SystemExit(1)
