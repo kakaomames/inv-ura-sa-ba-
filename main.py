@@ -59,7 +59,17 @@ app.include_router(video_playback_router, prefix="/videoplayback")
 
 
 # --- 6. ローカル実行用のエントリーポイント ---
+# main.py の app.include_router(...) の付近に追加
 
+@app.get("/")
+async def root_status():
+    """
+    サーバーのステータスチェック用ルート
+    """
+    return {"status": "ok", "message": "Invidious Companion Proxy is running!", "endpoint": "/videoplayback"}
+
+# 既存のルーターの組み込み
+#app.include_router(video_playback_router, prefix="/videoplayback")
 # Deno L301: if (import.meta.main) { ... } に相当
 if __name__ == "__main__":
     
