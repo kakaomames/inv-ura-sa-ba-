@@ -1,0 +1,22 @@
+{
+    "server": {
+        "host": "0.0.0.0",
+        "port": 8282,
+        "use_unix_socket": false,
+        "unix_socket_path": "/var/run/invidious_companion.sock"
+    },
+    "networking": {
+        "videoplayback": {
+            "video_fetch_chunk_size_mb": 5  
+            // 動画ストリームを分割するチャンクサイズ (5MBを再現)
+        }
+        // "proxy" の設定などは必要に応じてここに追加
+    },
+    "secret": {
+        // !!重要!!: これらはダミー値です。本番環境ではセキュアなランダムな文字列に置き換えてください。
+        "video_playback_decryption_key": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=", 
+        // 32バイト (AES-256) の Base64 エンコード
+        "video_playback_decryption_iv": "BBBBBBBBBBBBBBBBBBBBBBBB" 
+        // 16バイト (AES-128/256のIV) の Base64 エンコード
+    }
+}
