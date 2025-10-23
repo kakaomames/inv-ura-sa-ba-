@@ -11,7 +11,7 @@ import os
 
 # --- 1. システムパスの修正 ---
 # main.pyがあるディレクトリ(プロジェクトのルート)をパスに追加
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+#sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 
 # --- 2. 外部モジュールのインポート ---
