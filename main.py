@@ -19,7 +19,8 @@ import os
 from lib.helpers.config import parse_config 
 # Denoコードの videoPlaybackProxy の代わり
 from videoplayback import video_playback_router 
-
+# **最重要**: FastAPIアプリケーションインスタンスをグローバル変数 `app` として定義
+app = FastAPI(title="Invidious Companion Proxy")
 
 # --- 3. ロギング設定 ---
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
@@ -49,7 +50,7 @@ except SystemExit:
     sys.exit(1)
 
 # **最重要**: FastAPIアプリケーションインスタンスをグローバル変数 `app` として定義
-app = FastAPI(title="Invidious Companion Proxy")
+#app = FastAPI(title="Invidious Companion Proxy")
 
 # Context変数の設定 (Deno c.set("config", config) に相当)
 app.state.config = config_data
