@@ -16,7 +16,7 @@ def parse_config() -> Dict[str, Any]:
     # config_path = os.path.join(project_root, 'config.json')
 
     # 新しいロジック: 環境に依存せず、常にプロジェクトルート（カレントディレクトリ）の config.json を探す
-    config_path = os.path.join(os.getcwd(), 'config.json')
+    config_path = os.path.join(os.getcwd(), '/config.json')
     
     # os.getcwd()がVercelで信頼できない場合、最もシンプルな方法:
     config_path = 'config.json' 
