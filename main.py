@@ -6,26 +6,47 @@ import signal
 import logging
 import uvicorn
 from fastapi import FastAPI
-import sys
-import os
 
-# --- 1. システムパスの修正 ---
-# main.pyがあるディレクトリ(プロジェクトのルート)をパスに追加
-#sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-
-
-# --- 2. 外部モジュールのインポート ---
-# Denoコードの parseConfig の代わり
+# --- 1. 外部モジュールのインポート ---
+# Vercel環境でインポートできるように、パッケージのパス依存性を避けるため、
+# lib.helpers.configとvideoplaybackは直接インポートします。
 from lib.helpers.config import parse_config 
-# Denoコードの videoPlaybackProxy の代わり
 from videoplayback import video_playback_router 
+
+
+# --- 2. グローバルスコープ: Vercel/Gunicorn が使用する部分 ---
+
 # **最重要**: FastAPIアプリケーションインスタンスをグローバル変数 `app` として定義
+# Vercelはインポート時にこの変数を探します。
 app = FastAPI(title="Invidious Companion Proxy")
 
-# --- 3. ロギング設定 ---
+# ロギング設定 (FastAPIの初期化後に行う)
 logging.basicConfig(level=logging.INFO, format='[%(levelname)s] %(message)s')
 
-# --- 4. GracefulExit クラス（ローカル実行時のみ使用） ---
+
+# 2.1. 設定の読み込みと適用 (appが定義された後で実行)
+try:
+    config_data = parse_config()
+except SystemExit:
+    # 設定ファイルがない場合は、アプリの動作が保証できないためプロセスを終了
+    sys.exit(1)
+
+# Context変数の設定 (Deno c.set("config", config) に相当)
+app.state.config = config_data
+
+# ルーティングの組み込み (Deno routes(app, config); の代わり)
+app.include_router(video_playback_router, prefix="/videoplayback")
+
+# ルートパスの追加 (サーバーの状態確認用)
+@app.get("/")
+async def root_status():
+    """
+    サーバーのステータスチェック用ルート
+    """
+    return {"status": "ok", "message": "Invidious Companion Proxy is running!", "endpoint": "/videoplayback"}
+
+
+# --- 3. GracefulExit クラス（ローカル実行時のみ使用） ---
 # Deno L304-L318 のシグナルハンドリングを Python で再現
 class GracefulExit:
     def __init__(self, app: FastAPI):
@@ -40,38 +61,7 @@ class GracefulExit:
         os._exit(0) 
 
 
-# --- 5. グローバルスコープ: Vercel/Gunicorn が使用する部分 ---
-
-# 設定の読み込みは、サーバーレス環境でも必要
-try:
-    config_data = parse_config()
-except SystemExit:
-    # 設定ファイルがない場合はここで終了
-    sys.exit(1)
-
-# **最重要**: FastAPIアプリケーションインスタンスをグローバル変数 `app` として定義
-#app = FastAPI(title="Invidious Companion Proxy")
-
-# Context変数の設定 (Deno c.set("config", config) に相当)
-app.state.config = config_data
-
-# ルーティングの組み込み (Deno routes(app, config); の代わり)
-app.include_router(video_playback_router, prefix="/videoplayback")
-
-
-# --- 6. ローカル実行用のエントリーポイント ---
-# main.py の app.include_router(...) の付近に追加
-
-@app.get("/")
-async def root_status():
-    """
-    サーバーのステータスチェック用ルート
-    """
-    return {"status": "ok", "message": "Invidious Companion Proxy is running!", "endpoint": "/videoplayback"}
-
-# 既存のルーターの組み込み
-#app.include_router(video_playback_router, prefix="/videoplayback")
-# Deno L301: if (import.meta.main) { ... } に相当
+# --- 4. ローカル実行用のエントリーポイント ---
 if __name__ == "__main__":
     
     # シグナルハンドラのセットアップ
@@ -86,17 +76,14 @@ if __name__ == "__main__":
     if use_uds:
         logging.info(f"Unix Domain Socket ({uds_path}) を使用して起動します。")
         try:
-            # Deno L278: Deno.removeSync(udsPath);
             if os.path.exists(uds_path):
                 os.remove(uds_path)
         except Exception as e:
             logging.error(f"Failed to delete unix domain socket '{uds_path}' before starting the server: {e}")
             pass
 
-        # Uvicorn の Unix Domain Socket 設定
         server_config = uvicorn.Config(app, uds=uds_path)
         
-        # Deno L295: Deno.chmodSync(udsPath, 0o777); の再現ロジック
         def set_permissions():
             logging.info(f"Setting unix domain socket '{uds_path}' permissions to 777")
             try:
@@ -104,15 +91,12 @@ if __name__ == "__main__":
             except Exception as e:
                 logging.warning(f"Failed to set permissions on UDS: {e}")
 
-        # Uvicorn起動後に権限設定を実行
         async def startup_event():
-            # blocking IO operation (os.chmod) は別スレッドで実行
             await asyncio.to_thread(set_permissions)
         
         app.add_event_handler("startup", startup_event)
     
     else:
-        # 通常のホスト:ポート設定
         logging.info(f"Serving on http://{host}:{port}")
         server_config = uvicorn.Config(app, host=host, port=port)
     
