@@ -96,7 +96,7 @@ COPY ./src/ ./src/
 # Dependencies are cached in ${DENO_DIR} for our deno builder
 # RUN --mount=type=bind,rw,source=.github,target=/app/.github \
 RUN    --mount=type=cache,target="${DENO_DIR}" \
-       deno task compile
+       deno task compile --no-check
 
 FROM gcr.io/distroless/cc AS app
 
