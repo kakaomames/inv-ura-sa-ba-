@@ -5,6 +5,9 @@
     "test": "deno test --allow-import=github.com:443,jsr.io:443,cdn.jsdelivr.net:443,esm.sh:443,deno.land:443 --allow-net --allow-env --allow-sys=hostname --allow-read --allow-write=/var/tmp/youtubei.js",
     "format": "deno fmt src/**"
   },
+  "compilerOptions": {
+    "baseUrl": "./"
+  },
   "imports": {
     "meriyah": "https://esm.sh/meriyah",
     "@std/cli": "jsr:@std/cli@^1.0.17",
