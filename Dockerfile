@@ -73,8 +73,8 @@ RUN mkdir -v -p /var/tmp/youtubei.js
 
 ARG DENO_DIR
 RUN useradd --uid 1993 --user-group deno \
-  && mkdir -v "${DENO_DIR}" \
-  && chown deno:deno "${DENO_DIR}"
+    && mkdir -v "${DENO_DIR}" \
+    && chown deno:deno "${DENO_DIR}"
 
 ENV DENO_DIR="${DENO_DIR}" \
     DENO_INSTALL_ROOT='/usr/local'
@@ -94,9 +94,10 @@ COPY ./src/ ./src/
 # To let the `deno task compile` know the current commit on which
 # Invidious companion is being built, similar to how Invidious does it.
 # Dependencies are cached in ${DENO_DIR} for our deno builder
+# 💡 修正 1: ネイティブバイナリのコンパイル（メモリを大量消費）をスキップします。
 # RUN --mount=type=bind,rw,source=.github,target=/app/.github \
-RUN    --mount=type=cache,target="${DENO_DIR}" \
-       deno task compile --no-check
+# RUN    --mount=type=cache,target="${DENO_DIR}" \
+#       deno task compile --no-check
 
 FROM gcr.io/distroless/cc AS app
 
@@ -105,6 +106,10 @@ COPY --from=user-stage /etc/group /etc/group
 
 # Copy passwd file for the non-privileged user from the user-stage
 COPY --from=user-stage /etc/passwd /etc/passwd
+
+# 💡 修正 2: deno run に必要な Deno ランタイムとキャッシュをコピー
+COPY --from=debian-deno /usr/bin/deno /usr/bin/deno
+COPY --from=debian-deno /deno-dir /deno-dir
 
 COPY --from=thc-bin /thc /thc
 COPY --from=tini-bin /tini /tini
@@ -115,7 +120,12 @@ COPY --from=builder --chown=appuser:nogroup /var/tmp/youtubei.js /var/tmp/youtub
 # Set the working directory
 WORKDIR /app
 
-COPY --from=builder /app/invidious_companion ./
+# 💡 修正 3: コンパイルされたバイナリの代わりに、ソースコードと設定ファイルをコピー
+# COPY --from=builder /app/invidious_companion ./ <-- この行は削除
+COPY --from=builder /app/src/ ./src/
+COPY --from=builder /app/deno.json ./
+COPY --from=builder /app/deno.lock ./
+
 
 ARG HOST PORT THC_VERSION TINI_VERSION
 EXPOSE "${PORT}/tcp"
@@ -131,6 +141,7 @@ COPY ./config/ ./config/
 # Switch to non-privileged user
 USER appuser
 
-ENTRYPOINT ["/tini", "--", "/app/invidious_companion"]
+# 💡 修正 4: エントリポイントを Deno run でメインファイルを実行するように変更
+ENTRYPOINT ["/tini", "--", "deno", "run", "-A", "--import-map=/app/deno.json", "/app/src/main.ts"]
 
 HEALTHCHECK --interval=5s --timeout=5s --start-period=10s --retries=5 CMD ["/thc"]
