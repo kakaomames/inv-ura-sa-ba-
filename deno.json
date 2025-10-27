@@ -6,6 +6,7 @@
     "format": "deno fmt src/**"
   },
   "imports": {
+    "meriyah": "https://esm.sh/meriyah@4.3.17",
     "@std/cli": "jsr:@std/cli@^1.0.17",
     "hono": "jsr:@hono/hono@4.7.4",
     "@std/toml": "jsr:@std/toml@1.0.2",
