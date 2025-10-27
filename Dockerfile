@@ -95,8 +95,8 @@ COPY ./src/ ./src/
 # Invidious companion is being built, similar to how Invidious does it.
 # Dependencies are cached in ${DENO_DIR} for our deno builder
 # RUN --mount=type=bind,rw,source=.github,target=/app/.github \
-#     --mount=type=cache,target="${DENO_DIR}" \
-#     deno task compile
+RUN    --mount=type=cache,target="${DENO_DIR}" \
+       deno task compile
 
 FROM gcr.io/distroless/cc AS app
 
