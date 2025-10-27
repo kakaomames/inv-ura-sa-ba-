@@ -12,10 +12,15 @@ const latestVersion = new Hono();
 latestVersion.get("/", async (c) => {
     const { check, itag, id, local, title } = c.req.query();
     c.header("access-control-allow-origin", "*");
+    
+    console.log(`\n======================================================`);
+    console.log(`[START] リクエスト受信: パス /latest_version`);
+    console.log(`[INPUT] ID=${id}, itag=${itag}, local=${local}, check=${check}`);
+    console.log(`======================================================`);
 
     if (!id || !itag) {
         throw new HTTPException(400, {
-            res: new Response("Please specify the itag and video ID."),
+            res: new Response("itagとビデオIDを指定してください。"),
         });
     }
 
@@ -25,7 +30,7 @@ latestVersion.get("/", async (c) => {
 
     if (config.server.verify_requests && check == undefined) {
         throw new HTTPException(400, {
-            res: new Response("No check ID."),
+            res: new Response("チェックIDはありません。"),
         });
     } else if (config.server.verify_requests && check) {
         if (verifyRequest(check, id, config) === false) {
