@@ -24,8 +24,8 @@ function callWatchEndpoint(
    // console.log(`[REQ INFO] YouTube APIエンドポイント: /watch`);
     console.log(`[REQ INFO] Target Video ID: ${videoId}`);
     console.log(`[REQ INFO] Innertube Client Type (Client Header): ${innertubeClientType}`);
-    console.log(`[REQ INFO] Playback Context (signatureTimestamp): ${innertubeClient.session.player?.sts}`);
-    console.log(`[REQ INFO] PO Token (Security Header): ${contentPoToken.substring(0, 10)}...`);
+//    console.log(`[REQ INFO] Playback Context (signatureTimestamp): ${innertubeClient.session.player?.sts}`);
+//    console.log(`[REQ INFO] PO Token (Security Header): ${contentPoToken.substring(0, 10)}...`);
     console.log("-----------------------------------------");
     
     return watch_endpoint.call(
@@ -36,7 +36,7 @@ function callWatchEndpoint(
                     vis: 0,
                     splay: false,
                     lactMilliseconds: "-1",
-                    signatureTimestamp: innertubeClient.session.player?.sts,
+                    signatureTimestamp: innertubeClient.session,
                 },
             },
             serviceIntegrityDimensions: {
@@ -73,7 +73,9 @@ export const youtubePlayerReq = async (
     // 💡 ★ここにレスポンス情報をログに出力します！★
     console.log(`[RES INFO] APIレスポンス受信: Status ${youtubePlayerResponse.status_code}`);
     console.log("-----------------------------------------");
-    // Check if the first adaptive format URL is undefined, if it is then fallback to multiple YT clients
+
+    
+    // 最初のアダプティブフォーマットURLが未定義であるかどうかを確認し、定義されている場合は複数のYTクライアントにフォールバックします。
 
     if (
         !innertubeClientOauthEnabled &&
