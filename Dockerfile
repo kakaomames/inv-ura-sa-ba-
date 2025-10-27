@@ -94,7 +94,7 @@ COPY ./src/ ./src/
 # To let the `deno task compile` know the current commit on which
 # Invidious companion is being built, similar to how Invidious does it.
 # Dependencies are cached in ${DENO_DIR} for our deno builder
-RUN --mount=type=bind,rw,source=.git,target=/app/.git \
+RUN --mount=type=bind,rw,source=.git,target=/app/.github \
     --mount=type=cache,target="${DENO_DIR}" \
     deno task compile
 
