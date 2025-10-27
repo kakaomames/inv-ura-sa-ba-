@@ -36,7 +36,7 @@ function callWatchEndpoint(
                     vis: 0,
                     splay: false,
                     lactMilliseconds: "-1",
-                    signatureTimestamp: innertubeClient.session,
+                    signatureTimestamp: (innertubeClient.session.player as any)?.sts,
                 },
             },
             serviceIntegrityDimensions: {
