@@ -49,10 +49,13 @@ latestVersion.get("/", async (c) => {
         tokenMinter: c.get("tokenMinter"),
         metrics,
     });
+    console.log(`[STATUS] : ${youtubePlayerResponseJson}`);
+
     const videoInfo = youtubeVideoInfo(
         innertubeClient,
         youtubePlayerResponseJson,
     );
+    console.log(`[STATUS] : ${videoInfo}`);
 
     if (videoInfo.playability_status?.status !== "OK") {
         throw ("The video can't be played: " + id + " due to reason: " +
