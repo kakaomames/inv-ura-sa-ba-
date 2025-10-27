@@ -27,6 +27,8 @@ latestVersion.get("/", async (c) => {
     const innertubeClient = c.get("innertubeClient");
     const config = c.get("config");
     const metrics = c.get("metrics");
+    console.log(`[CONFIG] リクエスト検証 (verify_requests): ${config.server.verify_requests}`);
+
 
     if (config.server.verify_requests && check == undefined) {
         throw new HTTPException(400, {
