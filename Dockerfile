@@ -93,7 +93,7 @@ COPY ./src/ ./src/
 
 
 RUN --mount=type=cache,target="${DENO_DIR}" \
-    deno cache --check=all --import-map=deno.json src/main.ts
+    deno cache --check=all src/main.ts
     
 # To let the `deno task compile` know the current commit on which
 # Invidious companion is being built, similar to how Invidious does it.
