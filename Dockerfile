@@ -91,6 +91,15 @@ COPY deno.json ./
 
 COPY ./src/ ./src/
 
+# Deno実行ユーザーを作成
+RUN useradd --uid 1993 --user-group deno \
+    && mkdir -v "/deno-dir" \
+    && chown deno:deno "/deno-dir"
+
+
+ENV DENO_DIR=/deno-dir
+
+
 
 RUN --mount=type=cache,target="${DENO_DIR}" \
     deno cache --no-check src/main.ts
@@ -143,7 +152,9 @@ ENV HOST="${HOST}" \
 COPY ./config/ ./config/
 
 # Switch to non-privileged user
-USER appuser
+#USER appuser
+# Deno実行ユーザーに切り替える（このステップは通常 Dockerfileの最後に近い場所にあります）
+USER deno
 
 # 💡 修正 4: エントリポイントを Deno run でメインファイルを実行するように変更
 ENTRYPOINT ["/tini", "--", "deno", "run", "-A", "/app/src/main.ts"]
