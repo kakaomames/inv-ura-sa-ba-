@@ -96,6 +96,10 @@ COPY ./src/ ./src/
 
 ENV DENO_DIR=/deno-dir
 
+
+
+RUN chown -R deno:deno .
+
 USER deno
 
 RUN --mount=type=cache,target="/deno-dir",uid=1993,gid=1993 \
