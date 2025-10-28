@@ -16,6 +16,7 @@
     "@std/fs": "jsr:@std/fs",
     "@std/path": "jsr:@std/path",
     "@std/async": "jsr:@std/async",
+    "@std/toml": "jsr:@std/toml",
     "@std/encoding/base64": "jsr:@std/encoding/base64",
     "@std/cli/parse-args": "jsr:@std/cli/parse-args",
     
