@@ -152,7 +152,8 @@ COPY ./config/ ./config/
 # Switch to non-privileged user
 #USER appuser
 # Deno実行ユーザーに切り替える（このステップは通常 Dockerfileの最後に近い場所にあります）
-USER deno # 💡 実行ユーザーを appuser に戻す
+USER appuser 
+# 💡 実行ユーザーを appuser に戻す
 
 # 💡 Denoの実行コマンドを ENTRYPOINT に統一
 #    tiniが非特権ユーザーで実行できるよう、フルパスで指定
