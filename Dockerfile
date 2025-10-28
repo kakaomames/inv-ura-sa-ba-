@@ -142,6 +142,7 @@ COPY ./config/ ./config/
 USER appuser
 
 # 💡 修正 4: エントリポイントを Deno run でメインファイルを実行するように変更
-ENTRYPOINT ["/tini", "--", "deno", "run", "-A", "--import-map=/app/deno.json", "/app/src/main.ts"]
+ENTRYPOINT ["/tini", "--", "deno", "run", "-A", "/app/src/main.ts"]
+
 
 HEALTHCHECK --interval=5s --timeout=5s --start-period=10s --retries=5 CMD ["/thc"]
