@@ -99,7 +99,7 @@ RUN useradd --uid 1993 --user-group deno \
 
 ENV DENO_DIR=/deno-dir
 
-
+USER deno
 
 RUN --mount=type=cache,target="${DENO_DIR}" \
     deno cache --no-check src/main.ts
@@ -154,7 +154,7 @@ COPY ./config/ ./config/
 # Switch to non-privileged user
 #USER appuser
 # Deno実行ユーザーに切り替える（このステップは通常 Dockerfileの最後に近い場所にあります）
-USER deno
+#USER deno
 
 # 💡 修正 4: エントリポイントを Deno run でメインファイルを実行するように変更
 ENTRYPOINT ["/tini", "--", "deno", "run", "-A", "/app/src/main.ts"]
