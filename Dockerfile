@@ -92,26 +92,23 @@ COPY deno.json ./
 COPY ./src/ ./src/
 
 
-
-
 ENV DENO_DIR=/deno-dir
 
-
-
+# 💡 修正1: ファイルコピー後の権限修正 (deno.lock への書き込み権限確保)
 RUN chown -R deno:deno .
 
 USER deno
 
-#RUN --mount=type=cache,target="/deno-dir",uid=1993,gid=1993 \
-#    deno cache --no-check src/main.ts
+# 💡 修正2: メモリ不足回避のため、deno cache を --no-check と権限設定付きで復活
+RUN --mount=type=cache,target="/deno-dir",uid=1993,gid=1993 \
+    deno cache --no-check src/main.ts
     
 # To let the `deno task compile` know the current commit on which
 # Invidious companion is being built, similar to how Invidious does it.
 # Dependencies are cached in ${DENO_DIR} for our deno builder
-# 💡 修正 1: ネイティブバイナリのコンパイル（メモリを大量消費）をスキップします。
 # RUN --mount=type=bind,rw,source=.github,target=/app/.github \
-# RUN    --mount=type=cache,target="${DENO_DIR}" \
-#       deno task compile --no-check
+# RUN     --mount=type=cache,target="${DENO_DIR}" \
+#       deno task compile --no-check
 
 FROM gcr.io/distroless/cc AS app
 
@@ -121,9 +118,9 @@ COPY --from=user-stage /etc/group /etc/group
 # Copy passwd file for the non-privileged user from the user-stage
 COPY --from=user-stage /etc/passwd /etc/passwd
 
-# 💡 修正 2: deno run に必要な Deno ランタイムとキャッシュをコピー
+# 💡 修正3: Deno ランタイムと、builder ステージで解決されたキャッシュをコピー
 COPY --from=debian-deno /usr/bin/deno /usr/bin/deno
-COPY --from=debian-deno /deno-dir /deno-dir
+COPY --from=builder /deno-dir /deno-dir
 
 COPY --from=thc-bin /thc /thc
 COPY --from=tini-bin /tini /tini
@@ -134,7 +131,7 @@ COPY --from=builder --chown=appuser:nogroup /var/tmp/youtubei.js /var/tmp/youtub
 # Set the working directory
 WORKDIR /app
 
-# 💡 修正 3: コンパイルされたバイナリの代わりに、ソースコードと設定ファイルをコピー
+# 💡 修正4: ランタイムに必要なソースコードと設定ファイルをコピー
 # COPY --from=builder /app/invidious_companion ./ <-- この行は削除
 COPY --from=builder /app/src/ ./src/
 COPY --from=builder /app/deno.json ./
@@ -155,9 +152,9 @@ COPY ./config/ ./config/
 # Switch to non-privileged user
 #USER appuser
 # Deno実行ユーザーに切り替える（このステップは通常 Dockerfileの最後に近い場所にあります）
-#USER deno
+USER deno # 💡 実行ユーザーを deno に設定
 
-# 💡 修正 4: エントリポイントを Deno run でメインファイルを実行するように変更
+# 💡 修正5: エントリポイントを Deno run でメインファイルを実行するように変更
 ENTRYPOINT ["/tini", "--", "deno", "run", "-A", "src/main.ts"]
 
 
