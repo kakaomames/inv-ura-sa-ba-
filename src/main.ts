@@ -6,7 +6,7 @@ import { USER_AGENT } from "bgutils";
 import { retry } from "@std/async";
 import type { HonoVariables } from "./lib/types/HonoVariables.ts";
 import { parseArgs } from "@std/cli/parse-args";
-import { existsSync } from "@std/fs/exists.ts";
+import { existsSync } from "@std/fs/exists";
 
 import { parseConfig } from "./lib/helpers/config.ts";
 const config = await parseConfig();
