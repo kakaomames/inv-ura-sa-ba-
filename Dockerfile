@@ -155,7 +155,7 @@ COPY ./config/ ./config/
 # Deno実行ユーザーに切り替える（このステップは通常 Dockerfileの最後に近い場所にあります）
 USER appuser 
 # 💡 実行ユーザーを appuser に戻す
-
+ENV HOME=/tmp
 # 💡 Denoの実行コマンドを ENTRYPOINT に統一
 #    tiniが非特権ユーザーで実行できるよう、フルパスで指定
 ENTRYPOINT ["/tini", "--", "/usr/bin/deno", "run", "-A", "src/main.ts"]
