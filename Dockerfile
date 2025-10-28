@@ -152,10 +152,11 @@ COPY ./config/ ./config/
 # Switch to non-privileged user
 #USER appuser
 # Deno実行ユーザーに切り替える（このステップは通常 Dockerfileの最後に近い場所にあります）
-USER deno # 💡 実行ユーザーを deno に設定
+USER appuser # 💡 実行ユーザーを appuser に戻す
 
-# 💡 修正5: エントリポイントを Deno run でメインファイルを実行するように変更
-ENTRYPOINT ["/tini", "--", "deno", "run", "-A", "src/main.ts"]
+# 💡 Denoの実行コマンドを ENTRYPOINT に統一
+#    tiniが非特権ユーザーで実行できるよう、フルパスで指定
+ENTRYPOINT ["/tini", "--", "/usr/bin/deno", "run", "-A", "src/main.ts"]
 
 
 HEALTHCHECK --interval=5s --timeout=5s --start-period=10s --retries=5 CMD ["/thc"]
