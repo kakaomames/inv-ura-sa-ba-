@@ -72,6 +72,7 @@ FROM debian-git AS debian-deno
 RUN mkdir -v -p /var/tmp/youtubei.js
 
 ARG DENO_DIR
+ENV DENO_DIR=/deno-dir
 RUN useradd --uid 1993 --user-group deno \
     && mkdir -v "${DENO_DIR}" \
     && chown deno:deno "${DENO_DIR}"
