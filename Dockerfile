@@ -98,7 +98,7 @@ ENV DENO_DIR=/deno-dir
 
 USER deno
 
-RUN --mount=type=cache,target="/deno-dir",uid=1993,gid=deno \
+RUN --mount=type=cache,target="/deno-dir",uid=1993,gid=1993 \
     deno cache --no-check src/main.ts
     
 # To let the `deno task compile` know the current commit on which
