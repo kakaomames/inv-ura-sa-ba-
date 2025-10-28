@@ -102,8 +102,8 @@ RUN chown -R deno:deno .
 
 USER deno
 
-RUN --mount=type=cache,target="/deno-dir",uid=1993,gid=1993 \
-    deno cache --no-check src/main.ts
+#RUN --mount=type=cache,target="/deno-dir",uid=1993,gid=1993 \
+#    deno cache --no-check src/main.ts
     
 # To let the `deno task compile` know the current commit on which
 # Invidious companion is being built, similar to how Invidious does it.
@@ -158,7 +158,7 @@ COPY ./config/ ./config/
 #USER deno
 
 # 💡 修正 4: エントリポイントを Deno run でメインファイルを実行するように変更
-ENTRYPOINT ["/tini", "--", "deno", "run", "-A", "/app/src/main.ts"]
+ENTRYPOINT ["/tini", "--", "deno", "run", "-A", "src/main.ts"]
 
 
 HEALTHCHECK --interval=5s --timeout=5s --start-period=10s --retries=5 CMD ["/thc"]
