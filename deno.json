@@ -10,7 +10,7 @@
   },
   "imports": {
     "meriyah": "https://esm.sh/meriyah",
-    "hono/": "jsr:@hono/hono/",
+    "hono": "npm:hono",
     
     "@std/fs/exists": "jsr:@std/fs/exists",
     "@std/fs": "jsr:@std/fs",
